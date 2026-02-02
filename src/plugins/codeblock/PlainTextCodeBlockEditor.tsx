@@ -14,7 +14,7 @@ export const PlainTextCodeBlockEditor = ({ code }: CodeBlockEditorProps) => {
       <textarea
         rows={3}
         cols={20}
-        defaultValue={code}
+        value={code}
         onChange={(event) => {
           setCode(event.target.value)
         }}
