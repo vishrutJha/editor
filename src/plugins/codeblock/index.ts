@@ -13,6 +13,7 @@ import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from 
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { Cell, Signal, map, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
+import { PlainTextCodeBlockEditor } from './PlainTextCodeBlockEditor'
 export * from './CodeBlockNode'
 
 export type { CodeBlockEditorContextValue, CreateCodeBlockNodeOptions } from './CodeBlockNode'
@@ -69,6 +70,12 @@ export interface CodeBlockEditorDescriptor {
   Editor: React.ComponentType<CodeBlockEditorProps>
 }
 
+const fallbackCodeBlockEditorDescriptor: CodeBlockEditorDescriptor = {
+  priority: -1000,
+  match: () => true,
+  Editor: PlainTextCodeBlockEditor
+}
+
 /**
  * Contains the default language to use when creating a new code block if no language is passed.
  * @group Code Block
@@ -121,7 +128,7 @@ export const codeBlockPlugin = realmPlugin<{
   init(realm, params) {
     realm.pubIn({
       [addActivePlugin$]: 'codeblock',
-      [codeBlockEditorDescriptors$]: params?.codeBlockEditorDescriptors ?? [],
+      [codeBlockEditorDescriptors$]: [...(params?.codeBlockEditorDescriptors ?? []), fallbackCodeBlockEditorDescriptor],
       [addImportVisitor$]: MdastCodeVisitor,
       [addLexicalNode$]: CodeBlockNode,
       [addExportVisitor$]: CodeBlockVisitor
