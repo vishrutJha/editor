@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, expect, it } from 'vitest'
-import { MDXEditor, MDXEditorMethods } from '../'
+import { codeBlockPlugin, MDXEditor, MDXEditorMethods } from '../'
 import { render } from '@testing-library/react'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -9,6 +9,13 @@ import { render } from '@testing-library/react'
 function testIdenticalMarkdown(markdown: string) {
   const ref = React.createRef<MDXEditorMethods>()
   render(<MDXEditor ref={ref} markdown={markdown} />)
+  const processedMarkdown = ref.current?.getMarkdown().trim()
+  expect(processedMarkdown).toEqual(markdown.trim())
+}
+
+function testIdenticalMarkdownWithPlugins(markdown: string) {
+  const ref = React.createRef<MDXEditorMethods>()
+  render(<MDXEditor ref={ref} markdown={markdown} plugins={[codeBlockPlugin()]} />)
   const processedMarkdown = ref.current?.getMarkdown().trim()
   expect(processedMarkdown).toEqual(markdown.trim())
 }
@@ -36,6 +43,15 @@ describe('markdown import export', () => {
 
   it('works with italics', () => {
     testIdenticalMarkdown(`*Hello* World`)
+  })
+
+  it('supports fenced code blocks', () => {
+    const md = `
+\`\`\`js
+const hello = 'world'
+\`\`\`
+`
+    testIdenticalMarkdownWithPlugins(md)
   })
 
   it('works with strong', () => {
